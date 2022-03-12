@@ -1,0 +1,29 @@
+PROTOCOLO
+O protocolo utilizado entre consumidores/produtores e broker é baseado na troca de mensagens JSON,Xml,pickle ,precedidos do tamanho do documento que lhe segue.
+A primeira mensagem trocada é codificada em JSON, onde surgem os dois primeiros bytes codificados em big endian com informação do tamanho mensagem. O formato é o seguinte: {"method": "ACK", "Serializer":serialization_method}
+
+
+
+Para isso utilizamos o seguinte protocolo:
+
+mensagem de subscrição -> método "SUBSCRIBE"
+{'method': 'SUBSCRIBE','topic':topic,'msg':msg}
+RESPOSTA:
+enviar para o cliente a última mensagem desse canal
+{'method': 'LAST_MESSAGE','topic':topic,'msg':msg}
+
+mensagem de publicação -> método "PUBLISH", 
+{'method': 'PUBLISH','topic':topic,'msg':msg}
+RESPOSTA:
+envia uma mensagem 'MESSAGE' para todos os topicos e supertopicos (topicos pais) com a mensagem a ser publicada
+{'method': 'MESSAGE','topic':topic,'msg':msg}
+
+mensagem de cancelamento da subscrição -> método "CANCEL_SUBSCRIPTION"
+{'method': 'CANCEL_SUBSCRIPTION','topic':topic,'msg':msg}
+SEM RESPOSTA
+
+mensagem de pedido de listagem -> método "LIST_TOPICS"
+{'method': 'LIST_TOPICS','topic':topic,'msg':msg}
+RESPOSTA:
+envia uma mensagem "LIST_TOPIC_REP" com uma lista de tópicos onde o produtor já enviou mensagens  
+{'method': 'LIST_TOPIC_REP','topic':topic,'msg':msg}
